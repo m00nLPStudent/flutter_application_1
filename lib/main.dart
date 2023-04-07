@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
+
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -9,105 +10,149 @@ void main() {
   Future.delayed(Duration(seconds: 3), () {
     runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MyApp(),
+      home: CardPile(),
     ));
   });
 
 }
 
-class MyApp extends StatelessWidget {
+class CardPile extends StatefulWidget {
+  @override
+  _CardPileState createState() => _CardPileState();
+}
+
+class _CardPileState extends State<CardPile> {
+  final karten = [
+    '1.png',
+    '2.png',
+    '3.png',
+    '4.png',
+    '5.png',
+    '6.png',
+    '7.png',
+    '8.png',
+    '9.png',
+    '10.png',
+    '11.png',
+    '12.png',
+    '13.png',
+    '14.png',
+    '15.png',
+    '16.png',
+    '17.png',
+    '18.png',
+    '19.png',
+    '20.png',
+    '21.png'
+  ];
+  String selectedCard = '';
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Kartenlege-App',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Kartenlege-App'),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text('Drücke den Button, um eine Tarotkarte zu ziehen:'),
-              SizedBox(height: 20.0),
-              ElevatedButton(
-                child: Text('Karte ziehen'),
-                onPressed: () => zieheKarte(context),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Kartenlege-App'),
+      ),
+      body: Stack(
+        children: [
+          // Anzeigen der Kartenrückseite
+          ...karten.map((kartenname) {
+            final randomAngle = Random().nextInt(90) - 45;
+            final randomWidth = Random().nextInt(40) + 100;
+            final randomHeight = Random().nextInt(40) + 150;
+            final left = 100.0;
+            final top = 100.0;
+
+            return Positioned(
+              left: left,
+              top: top,
+              child: Transform.rotate(
+                angle: randomAngle * pi / 180,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedCard = kartenname;
+                    });
+                    _showCard(context);
+                  },
+                  child: Image.asset(
+                    'images/back.png',
+                    width: randomWidth.toDouble(),
+                    height: randomHeight.toDouble(),
+                  ),
+                ),
               ),
-              SizedBox(height: 20.0),
-              Image.asset(
-                'images/placeholder.png',
-                height: 300.0,
+            );
+          }).toList(),
+          // Anzeigen der ausgewählten Karte
+          if (selectedCard.isNotEmpty)
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    selectedCard = '';
+                  });
+                },
+                child: Container(
+                  color: Colors.black54,
+                  child: Center(
+                    child: Image.asset(
+                      'images/$selectedCard',
+                      height: 300.0,
+                    ),
+                  ),
+                ),
               ),
-            ],
-          ),
-        ),
+            ),
+        ],
       ),
     );
   }
 
-  void zieheKarte(BuildContext context) {
-    final karten = [
-      '1.png',
-      '2.png',
-      '3.png',
-      '4.png',
-      '5.png',
-      '6.png',
-      '7.png',
-      '8.png',
-      '9.png',
-      '10.png',
-      '11.png',
-      '12.png',
-      '13.png',
-      '14.png',
-      '15.png',
-      '16.png',
-      '17.png',
-      '18.png',
-      '19.png',
-      '20.png',
-      '21.png'
-    ];
-    final zufallszahl = Random().nextInt(karten.length);
-    final kartenname = karten[zufallszahl];
+  // Anzeigen einer ausgewählten Karte in einer Dialogbox
+  void _showCard(BuildContext context) {
+    String newCard;
+    do {
+      newCard = karten[Random().nextInt(karten.length)];
+    } while (newCard == selectedCard);
+    setState(() {
+      selectedCard = newCard;
+    });
 
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text('Deine Tarotkarte'),
-              content: GestureDetector(
-                onHorizontalDragEnd: (details) {
-                  if (details.primaryVelocity == 0) return;
-                  if (details.primaryVelocity?.compareTo(0) == -1) {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            Kartenbeschreibung(kartenname: kartenname),
-                      ),
-                    );
-                  }
-                },
-                child: Image.asset('images/$kartenname'),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
+        context: context,
+        builder: (BuildContext context) {
+      return AlertDialog(
+          title: Text('Deine Tarotkarte'),
+          content: GestureDetector(
+          onHorizontalDragEnd: (details) {
+        if (details.primaryVelocity == 0) return;
+
+        if (details.primaryVelocity?.compareTo(0) == -1) {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Kartenbeschreibung(kartenname: newCard),
+            ),
+          );
+        }
           },
-        );
-      },
+            child: Image.asset('images/$newCard'),
+          ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('OK'),
+            onPressed: () {
+              setState(() {
+                selectedCard = '';
+              });
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+        },
     );
   }
 }
