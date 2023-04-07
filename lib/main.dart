@@ -61,7 +61,8 @@ class MyApp extends StatelessWidget {
       '18.png',
       '19.png',
       '20.png',
-      '21.png'
+      '21.png',
+      '22.png'
     ];
     final zufallszahl = Random().nextInt(karten.length);
     final kartenname = karten[zufallszahl];
