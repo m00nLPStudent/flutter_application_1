@@ -69,19 +69,71 @@ class MyApp extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Deine Tarotkarte'),
-          content: Image.asset('images/$kartenname'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Deine Tarotkarte'),
+              content: GestureDetector(
+                onHorizontalDragEnd: (details) {
+                  if (details.primaryVelocity == 0) return;
+                  if (details.primaryVelocity?.compareTo(0) == -1) {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            Kartenbeschreibung(kartenname: kartenname),
+                      ),
+                    );
+                  }
+                },
+                child: Image.asset('images/$kartenname'),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
         );
       },
+    );
+  }
+}
+
+class Kartenbeschreibung extends StatelessWidget {
+  final String kartenname;
+
+  Kartenbeschreibung({required this.kartenname});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Beschreibung'),
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            'images/$kartenname',
+            height: 300.0,
+          ),
+          SizedBox(height: 20.0),
+          Text(
+            'Hier könnte die Beschreibung der Karte stehen.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
