@@ -49,20 +49,29 @@ class _CardPileState extends State<CardPile> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Kartenlege-App'),
       ),
-      body: Stack(
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('images/background.gif'),
+            fit: BoxFit.cover,
+          ),
+        ),
+      child: Stack(
         children: [
           // Anzeigen der Kartenrückseite
           ...karten.map((kartenname) {
             final randomAngle = Random().nextInt(90) - 45;
-            final randomWidth = Random().nextInt(40) + 100;
-            final randomHeight = Random().nextInt(40) + 150;
-            final left = 100.0;
-            final top = 100.0;
-
+            final randomWidth = Random().nextInt(80) + 140;
+            final randomHeight = Random().nextInt(80) + 200;
+            final left = screenWidth / 2 - randomWidth / 2;
+            final top = screenHeight / 2.5 - randomHeight / 2;
             return Positioned(
               left: left,
               top: top,
@@ -106,6 +115,7 @@ class _CardPileState extends State<CardPile> {
             ),
         ],
       ),
+    ),
     );
   }
 
