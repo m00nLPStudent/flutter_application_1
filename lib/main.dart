@@ -4,8 +4,15 @@ import 'package:flutter/material.dart';
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: MyApp(),
+    home: SplashScreen(),
   ));
+  Future.delayed(Duration(seconds: 3), () {
+    runApp(MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: MyApp(),
+    ));
+  });
+
 }
 
 class MyApp extends StatelessWidget {
@@ -133,6 +140,16 @@ class Kartenbeschreibung extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+class SplashScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text('Kartenlege-App'),
       ),
     );
   }
