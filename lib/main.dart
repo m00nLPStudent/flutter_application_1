@@ -107,7 +107,6 @@ class _CardPileState extends State<CardPile> {
     '29.png',
     '30.png',
     '31.png',
-    '32.png',
     '33.png',
     '34.png',
     '35.png',
