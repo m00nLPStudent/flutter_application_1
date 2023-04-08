@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 
 void main() {
@@ -7,14 +9,66 @@ void main() {
     debugShowCheckedModeBanner: false,
     home: SplashScreen(),
   ));
-  Future.delayed(Duration(seconds: 3), () {
+  Future.delayed(const Duration(seconds: 10), () {
     runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
       home: CardPile(),
     ));
   });
-
 }
+
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  late VideoPlayerController _controller;
+  late Future<void> _initializeVideoPlayerFuture;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = VideoPlayerController.asset('videos/splash.mp4');
+    _initializeVideoPlayerFuture = _controller.initialize();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _initializeVideoPlayerFuture,
+      builder: (context, snapshot) {
+        print("Connection state: ${snapshot.connectionState}");
+        if (snapshot.connectionState == ConnectionState.done) {
+          _controller.play();
+          return Container(
+            color: Colors.white,
+            child: AspectRatio(
+              aspectRatio: _controller.value.aspectRatio,
+              child: FittedBox(
+                fit: BoxFit.fitWidth,
+                child: SizedBox(
+                  width: _controller.value.size.width ?? 0,
+                  height: _controller.value.size.height ?? 0,
+                  child: VideoPlayer(_controller),
+                ),
+              ),
+            ),
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
+}
+
 
 class CardPile extends StatefulWidget {
   @override
@@ -47,6 +101,14 @@ class _CardPileState extends State<CardPile> {
   ];
   String selectedCard = '';
 
+  List<String> menuItems = [
+    'Element 1',
+    'Element 2',
+    'Element 3',
+  ];
+
+  String selectedItem = 'Element 1';
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -54,68 +116,85 @@ class _CardPileState extends State<CardPile> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Kartenlege-App'),
+        title: const Text('Kartenlege-App'),
+        leading: PopupMenuButton(
+          itemBuilder: (BuildContext context) {
+            return menuItems.map((String item) {
+              return PopupMenuItem(
+                value: item,
+                child: Text(item),
+              );
+            }).toList();
+          },
+          onSelected: (String newValue) {
+            setState(() {
+              selectedItem = newValue;
+            });
+          },
+          offset: const Offset(-100, 0),
+        ),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('images/background.gif'),
             fit: BoxFit.cover,
           ),
         ),
-      child: Stack(
-        children: [
-          // Anzeigen der Kartenrückseite
-          ...karten.map((kartenname) {
-            final randomAngle = Random().nextInt(90) - 45;
-            final randomWidth = Random().nextInt(80) + 140;
-            final randomHeight = Random().nextInt(80) + 200;
-            final left = screenWidth / 2 - randomWidth / 2;
-            final top = screenHeight / 2.5 - randomHeight / 2;
-            return Positioned(
-              left: left,
-              top: top,
-              child: Transform.rotate(
-                angle: randomAngle * pi / 180,
+        child: Stack(
+          children: [
+            // Anzeigen der Kartenrückseite
+            ...karten.map((kartenname) {
+              final randomAngle = Random().nextInt(90) - 45;
+              final randomWidth = Random().nextInt(80) + 140;
+              final randomHeight = Random().nextInt(80) + 200;
+              final left = screenWidth / 2 - randomWidth / 2;
+              final top = screenHeight / 2.5 - randomHeight / 2;
+              return Positioned(
+                left: left,
+                top: top,
+                child: Transform.rotate(
+                  angle: randomAngle * pi / 180,
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedCard = kartenname;
+                      });
+                      _showCard(context);
+                    },
+                    child: Image.asset(
+                      'images/back.png',
+                      width: randomWidth.toDouble(),
+                      height: randomHeight.toDouble(),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+            // Anzeigen der ausgewählten Karte
+            if (selectedCard.isNotEmpty)
+              Positioned.fill(
                 child: GestureDetector(
                   onTap: () {
                     setState(() {
-                      selectedCard = kartenname;
+                      selectedCard = '';
                     });
-                    _showCard(context);
                   },
-                  child: Image.asset(
-                    'images/back.png',
-                    width: randomWidth.toDouble(),
-                    height: randomHeight.toDouble(),
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-          // Anzeigen der ausgewählten Karte
-          if (selectedCard.isNotEmpty)
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedCard = '';
-                  });
-                },
-                child: Container(
-                  color: Colors.black54,
-                  child: Center(
-                    child: Image.asset(
-                      'images/$selectedCard',
-                      height: 300.0,
+                  child: Container(
+                    color: Colors.black54,
+                    child: Center(
+                      child: Image.asset(
+                        'images/$selectedCard',
+                        height: 300.0,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-        ],
+
+          ],
+        ),
       ),
-    ),
     );
   }
 
@@ -130,39 +209,39 @@ class _CardPileState extends State<CardPile> {
     });
 
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-      return AlertDialog(
-          title: Text('Deine Tarotkarte'),
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Deine Tarotkarte'),
           content: GestureDetector(
-          onHorizontalDragEnd: (details) {
-        if (details.primaryVelocity == 0) return;
+            onHorizontalDragEnd: (details) {
+              if (details.primaryVelocity == 0) return;
 
-        if (details.primaryVelocity?.compareTo(0) == -1) {
-          Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Kartenbeschreibung(kartenname: newCard),
-            ),
-          );
-        }
-          },
+              if (details.primaryVelocity?.compareTo(0) == -1) {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Kartenbeschreibung(kartenname: newCard),
+                  ),
+                );
+              }
+            },
             child: Image.asset('images/$newCard'),
           ),
-        actions: <Widget>[
-          TextButton(
-            child: Text('OK'),
-            onPressed: () {
-              setState(() {
-                selectedCard = '';
-              });
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-        },
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                setState(() {
+                  selectedCard = '';
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -176,7 +255,7 @@ class Kartenbeschreibung extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Beschreibung'),
+        title: const Text('Beschreibung'),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -185,8 +264,8 @@ class Kartenbeschreibung extends StatelessWidget {
             'images/$kartenname',
             height: 300.0,
           ),
-          SizedBox(height: 20.0),
-          Text(
+          const SizedBox(height: 20.0),
+          const Text(
             'Hier könnte die Beschreibung der Karte stehen.',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -199,13 +278,14 @@ class Kartenbeschreibung extends StatelessWidget {
     );
   }
 }
-class SplashScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text('Kartenlege-App'),
-      ),
-    );
-  }
-}
+
+//class SplashScreen extends StatelessWidget {
+//  @override
+//  Widget build(BuildContext context) {
+//    return const Scaffold(
+//    body: Center(
+//      child: Text('Kartenlege-App'),
+//    ),
+//  );
+// }
+//}
