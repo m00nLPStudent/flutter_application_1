@@ -133,7 +133,7 @@ class _CardPileState extends State<CardPile> {
         ),
         child: Stack(
           children: [
-            // Anzeigen der Kartenrückseite
+            // Anzeigen der Kartenrckseite
             ...karten.map((kartenname) {
               final randomAngle = Random().nextInt(90) - 45;
               final randomWidth = Random().nextInt(80) + 140;
