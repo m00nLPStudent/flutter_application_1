@@ -86,14 +86,14 @@ class _CardPileState extends State<CardPile> {
   Translation translation = Translation(entries: {});
 
   void _readFile() async {
-    FileStorage storage = FileStorage(locale: "deDE");
+    FileStorage storage = FileStorage(locale: "enEN");
     translation = await storage.parseFile();
   }
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _readFile();
     });
   }

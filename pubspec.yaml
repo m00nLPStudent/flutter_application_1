@@ -128,6 +128,8 @@ flutter:
     - images/der_zielbewusste_neureiche.png
     - videos/splash.webm
     - videos/splash.mp4
+    - lang/deDE.json
+    - lang/enEN.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
