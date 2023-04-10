@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
+
 
 class Entry {
   Entry({required this.name, required this.description});
@@ -47,8 +49,14 @@ class Translation {
   }
 
   factory Translation.parseString(String src) {
-    List data = jsonDecode(src);
-    return Translation.fromJson(data);
+    try {
+      List data = jsonDecode(src);
+      return Translation.fromJson(data);
+    }
+    catch (e) {
+      //print(e.toString());
+      return Translation(entries: {});
+    }
   }
 }
 
@@ -56,18 +64,21 @@ class FileStorage {
   FileStorage({required this.locale});
 
   final String locale;
-
+  /*
   Future<File> get _localFile async {
     return File('lang/$locale.json');
   }
-
+  */
   Future<String> readFileAsString() async {
-    String contents = "";
-    final file = await _localFile;
-    if (file.existsSync()) {
-      //Must check or error is thrown
-      contents = await file.readAsString();
-    }
+    String contents = "[]";
+    //final file = await _localFile;
+    //if (file.existsSync()) {
+    //Must check or error is thrown
+    //contents = await file.readAsString();
+    //contents = await rootBundle.loadString('lang/$locale.json');
+    await rootBundle.loadString('lang/$locale.json').then((s) => { contents = s });
+    //print(contents);
+    //}
     return contents;
   }
 
