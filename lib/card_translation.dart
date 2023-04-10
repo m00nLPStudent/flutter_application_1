@@ -28,20 +28,26 @@ class Translation {
   final Map<String, String> entries;
 
   String translate(String key) {
-    return entries[key] ?? "<missing translation>";
+    return entries[key] ?? "<missing translation for '$key'>";
   }
 
-  factory Translation.fromJson(List<dynamic> data) {
-    final entries = data as List<Entry>;
+  factory Translation.fromJson(List data) {
     final Map<String, String> map = {};
-    for (var e in entries) {
-      map[e.name] = e.description;
+    if (data != null) {
+      for (var element in data) {
+        String name = element['name'];
+        String desc = element['description'];
+        if (name != null) {
+          //print(name +"  "+ desc);
+          map["$name.png"] = desc ?? "";
+        }
+      }
     }
     return Translation(entries: map);
   }
 
   factory Translation.parseString(String src) {
-    List<dynamic> data = jsonDecode(src);
+    List data = jsonDecode(src);
     return Translation.fromJson(data);
   }
 }
