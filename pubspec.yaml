@@ -130,6 +130,11 @@ flutter:
     - videos/splash.mp4
     - lang/deDE.json
     - lang/enEN.json
+    - lang/arAR.json
+    - lang/frFR.json
+    - lang/ruRU.json
+    - lang/trTR.json
+    - lang/zhZH.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
