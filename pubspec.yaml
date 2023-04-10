@@ -127,7 +127,9 @@ flutter:
     - images/der_wissenschftliche_gluecksbringer.png
     - images/der_zielbewusste_neureiche.png
     - videos/splash.webm
-    - videos/splash.mp4
+    - videos/splash_mobile_small.mp4
+    - videos/splash_mobile.mp4
+    - videos/splash_desktop.mp4
     - lang/deDE.json
     - lang/enEN.json
     - lang/arAR.json
