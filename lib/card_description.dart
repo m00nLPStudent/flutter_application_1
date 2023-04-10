@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class Kartenbeschreibung extends StatelessWidget {
-  final String kartenname;
+  Kartenbeschreibung({required this.kartenname, required this.description});
 
-  Kartenbeschreibung({required this.kartenname});
+  final String kartenname;
+  final String description;
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +20,10 @@ class Kartenbeschreibung extends StatelessWidget {
             height: 300.0,
           ),
           const SizedBox(height: 20.0),
-          const Text(
-            'Hier könnte die Beschreibung der Karte stehen.',
+          Text(
+            description,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18.0,
               fontWeight: FontWeight.bold,
             ),

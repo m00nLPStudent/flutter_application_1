@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'card_description.dart';
+import 'card_translation.dart';
 
 class CardPile extends StatefulWidget {
   @override
@@ -82,11 +83,26 @@ class _CardPileState extends State<CardPile> {
   ];
 
   String selectedItem = 'Element 1';
+  Translation translation = Translation(entries: {});
+
+  void _readFile() async {
+    FileStorage storage = FileStorage(locale: "deDE");
+    translation = await storage.parseFile();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      _readFile();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    _readFile();
 
     return Scaffold(
       appBar: AppBar(
@@ -118,7 +134,7 @@ class _CardPileState extends State<CardPile> {
         child: Stack(
           children: [
             // Anzeigen der Kartenrückseite
-            ... karten.map((kartenname) {
+            ...karten.map((kartenname) {
               final randomAngle = Random().nextInt(90) - 45;
               final randomWidth = Random().nextInt(80) + 140;
               final randomHeight = Random().nextInt(80) + 200;
@@ -174,8 +190,10 @@ class _CardPileState extends State<CardPile> {
   // Anzeigen einer ausgewählten Karte in einer Dialogbox
   void _showCard(BuildContext context) {
     String newCard;
+    String newDesc;
     do {
       newCard = karten[Random().nextInt(karten.length)];
+      newDesc = translation.translate(newCard);
     } while (newCard == selectedCard);
     setState(() {
       selectedCard = newCard;
@@ -195,8 +213,8 @@ class _CardPileState extends State<CardPile> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        Kartenbeschreibung(kartenname: newCard),
+                    builder: (context) => Kartenbeschreibung(
+                        kartenname: newCard, description: newDesc),
                   ),
                 );
               }
