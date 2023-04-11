@@ -17,7 +17,7 @@ class _CardPileState extends State<CardPile> {
   Translation translation = Translation(entries: {});
 
   void _readFile() async {
-    FileStorage storage = FileStorage(locale: "enEN");
+    FileStorage storage = FileStorage(locale: "trTR");
     translation = await storage.parseFile();
   }
 
@@ -234,38 +234,80 @@ class _CardPileState extends State<CardPile> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Deine Tarotkarte'),
-          content: GestureDetector(
-            onHorizontalDragEnd: (details) {
-              if (details.primaryVelocity == 0) return;
+        return GestureDetector(
+          onHorizontalDragEnd: (details) {
+            if (details.primaryVelocity == 0) return;
 
-              if (details.primaryVelocity?.compareTo(0) == -1) {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Kartenbeschreibung(
-                        kartenname: newCard, description: newDesc),
+            if (details.primaryVelocity?.compareTo(0) == -1) {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Kartenbeschreibung(
+                    kartenname: newCard,
+                    description: newDesc,
                   ),
-                );
-              }
-            },
-            child: Image.asset('images/$newCard'),
+                ),
+              );
+            }
+          },
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Image.asset(
+                'images/$newCard',
+                width: MediaQuery.of(context).size.width * 0.7,
+                height: MediaQuery.of(context).size.height * 0.7,
+                fit: BoxFit.contain,
+              ),
+              Positioned(
+                top: 20,
+                child: Text(
+                  newCard,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 50,
+                child: TweenAnimationBuilder<double>(
+                  duration: Duration(milliseconds: 500),
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  builder: (BuildContext context, double value, Widget? child) {
+                    return Transform.scale(
+                      scale: value,
+                      child: child,
+                    );
+                  },
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Kartenbeschreibung(
+                            kartenname: newCard,
+                            description: newDesc,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                setState(() {
-                  selectedCard = '';
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+        )
+        ;
       },
     );
   }
+
 }
