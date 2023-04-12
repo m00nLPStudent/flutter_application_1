@@ -132,6 +132,13 @@ flutter:
     - images/der_wissenschftliche_gluecksbringer.png
     - images/der_zielbewusste_neureiche.png
     - images/appbar_background.png
+    - images/china.png
+    - images/ger.png
+    - images/eng.png
+    - images/fr.png
+    - images/ru.png
+    - images/tr.png
+    - images/ar.png
     - videos/splash.webm
     - videos/splash_mobile_small.mp4
     - videos/splash_mobile.mp4

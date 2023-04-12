@@ -13,7 +13,7 @@ class CardMenuWidget extends StatelessWidget {
           builder: (BuildContext context, BoxConstraints constraints) {
             if (constraints.maxWidth > 600) {
               // code for wide screen
-              return const Row(
+              return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   PrivacyWidget(),
