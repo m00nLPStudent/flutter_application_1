@@ -5,7 +5,7 @@ import 'card_translation.dart';
 import 'card_list.dart';
 
 class CardStackWidget extends StatefulWidget {
-  const CardStackWidget({super.key});
+  const CardStackWidget({Key? key}) : super(key: key);
 
   @override
   CardStack createState() => CardStack();
@@ -22,16 +22,6 @@ class CardStack extends State<CardStackWidget> {
     translation = await storage.parseFile();
   }
 
-/*
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _readFile();
-    });
-  }
-*/
-
   @override
   Widget build(BuildContext context) {
     _readFile();
@@ -47,7 +37,7 @@ class CardStack extends State<CardStackWidget> {
         child: Stack(
           children: [
             // Anzeigen der Kartenrückseite
-            ...karten.map((name) => _selectCard(name, context)).toList(),
+            ...karten.asMap().entries.map((entry) => _selectCard(entry.key, entry.value, context)).toList(),
             // Anzeigen der ausgewählten Karte
             if (selectedCard.isNotEmpty)
               Positioned.fill(
@@ -74,22 +64,30 @@ class CardStack extends State<CardStackWidget> {
     );
   }
 
-  Positioned _selectCard(String kartenname, BuildContext context) {
+  Positioned _selectCard(int index, String kartenname, BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
 
-    final double cardWidth = screenWidth * 0.6;
-    final double cardHeight = screenHeight * 0.4;
-    final double left = (screenWidth - cardWidth) / 2;
-    final double top = (screenHeight - cardHeight) / 2;
+    // Größe der Karten dynamisch an die Bildschirmgröße anpassen
+    final double cardWidth = screenWidth * (screenWidth > 600 ? 0.35 : 0.45);
+    final double cardHeight = screenHeight * (screenWidth > 600 ? 0.15 : 0.2);
 
-    final randomAngle = Random().nextInt(90) - 45;
+    final double centerX = screenWidth * 0.85; // erhöht, um den Fächer weiter in die Mitte zu bewegen
+    final double centerY = screenHeight * 0.6; // erhöht, um den Fächer nach oben zu bewegen
+
+    // Radius des Bogens dynamisch an die Bildschirmgröße anpassen
+    final double radius = screenWidth > 600 ? 280.0 : 140.0;
+    final double angleStep = pi / (karten.length - 1);
+    final double currentAngle = angleStep * index;
+
+    final double xOffset = radius * (1 - cos(currentAngle));
+    final double yOffset = radius * sin(currentAngle);
 
     return Positioned(
-        left: left,
-        top: top,
+        left: centerX - cardWidth / 2 - xOffset,
+        top: centerY - cardHeight / 2 - yOffset,
         child: Transform.rotate(
-          angle: randomAngle * pi / 180,
+          angle: -currentAngle,
           child: GestureDetector(
             onTap: () {
               setState(() {
