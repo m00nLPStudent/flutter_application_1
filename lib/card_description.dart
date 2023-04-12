@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Kartenbeschreibung extends StatelessWidget {
-  Kartenbeschreibung({required this.kartenname, required this.description});
+  const Kartenbeschreibung({super.key, required this.kartenname, required this.description});
 
   final String kartenname;
   final String description;
@@ -15,7 +15,7 @@ class Kartenbeschreibung extends StatelessWidget {
         alignment: Alignment.topLeft,
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('images/background.jpg'),
                 fit: BoxFit.cover,
@@ -41,7 +41,7 @@ class Kartenbeschreibung extends StatelessWidget {
             top: 20,
             right: 20,
             child: IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.arrow_back_ios,
                 color: Colors.white,
               ),
@@ -57,7 +57,7 @@ class Kartenbeschreibung extends StatelessWidget {
             left: 10,
             right: 10,
             child: Container(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.9),
                 border: Border.all(
@@ -70,7 +70,7 @@ class Kartenbeschreibung extends StatelessWidget {
                 child: Text(
                   description,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: 18,
                   ),
@@ -84,7 +84,7 @@ class Kartenbeschreibung extends StatelessWidget {
               left: MediaQuery.of(context).size.width * 0.1,
               child: Text(
                 kartenname,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

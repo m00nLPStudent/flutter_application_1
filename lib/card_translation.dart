@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/services.dart' show rootBundle;
 
-
 class Entry {
   Entry({required this.name, required this.description});
 
@@ -51,8 +50,7 @@ class Translation {
     try {
       List data = jsonDecode(src);
       return Translation.fromJson(data);
-    }
-    catch (e) {
+    } catch (e) {
       //print(e.toString());
       return Translation(entries: {});
     }
@@ -67,7 +65,9 @@ class FileStorage {
   Future<String> readFileAsString() async {
     String contents = "[]";
 
-    await rootBundle.loadString('lang/$locale.json').then((s) => { contents = s });
+    await rootBundle
+        .loadString('lang/$locale.json')
+        .then((s) => {contents = s});
 
     return contents;
   }

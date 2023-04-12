@@ -4,14 +4,14 @@ import 'splash_screen.dart';
 import 'card_pile.dart';
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: SplashScreen(),
+    home: SplashScreenWidget(),
   ));
   Future.delayed(const Duration(seconds: 6), () {
-    runApp(MaterialApp(
+    runApp(const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: CardPile(),
+      home: CardPileWidget(),
     ));
   });
 }
