@@ -14,6 +14,9 @@ class CardStackWidget extends StatefulWidget {
 class CardStack extends State<CardStackWidget> {
   final karten = cardList;
   String selectedCard = '';
+  String previouslySelectedCard = '';
+  bool isSecondTap = false;
+  bool shouldShowCard = false;
 
   Translation translation = Translation(entries: {});
 
@@ -23,9 +26,13 @@ class CardStack extends State<CardStackWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     _readFile();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Expanded(
       child: Container(
         decoration: const BoxDecoration(
@@ -39,12 +46,22 @@ class CardStack extends State<CardStackWidget> {
             // Anzeigen der Kartenrückseite
             ...karten.asMap().entries.map((entry) => _selectCard(entry.key, entry.value, context)).toList(),
             // Anzeigen der ausgewählten Karte
-            if (selectedCard.isNotEmpty)
+            if (selectedCard.isNotEmpty && isSecondTap)
               Positioned.fill(
                 child: GestureDetector(
                   onTap: () {
                     setState(() {
-                      selectedCard = '';
+                      if (selectedCard == previouslySelectedCard && !isSecondTap) {
+                        isSecondTap = true;
+                      } else if (selectedCard == previouslySelectedCard && isSecondTap) {
+                        isSecondTap = false;
+                        shouldShowCard = true;
+                        _showCard(context);
+                      } else {
+                        previouslySelectedCard = selectedCard;
+                        selectedCard = '';
+                        isSecondTap = false;
+                      }
                     });
                   },
                   child: Container(
@@ -68,53 +85,59 @@ class CardStack extends State<CardStackWidget> {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
 
-    // Größe der Karten dynamisch an die Bildschirmgröße anpassen
-    final double cardWidth = screenWidth * (screenWidth > 600 ? 0.35 : 0.45);
-    final double cardHeight = screenHeight * (screenWidth > 600 ? 0.15 : 0.2);
+    final double sizeFactor = screenWidth > 600 ? 1.4 : 1.0;
+    final double cardWidth = screenWidth * 0.45 * sizeFactor;
+    final double cardHeight = screenHeight * 0.2 * sizeFactor;
 
-    final double centerX = screenWidth * 0.85; // erhöht, um den Fächer weiter in die Mitte zu bewegen
-    final double centerY = screenHeight * 0.6; // erhöht, um den Fächer nach oben zu bewegen
+    final double centerX = screenWidth * (screenWidth > 600 ? 0.8 : 0.85);
+    final double centerY = screenHeight * (screenWidth > 600 ? 0.7 : 0.6);
 
-    // Radius des Bogens dynamisch an die Bildschirmgröße anpassen
-    final double radius = screenWidth > 600 ? 280.0 : 140.0;
+    final double radius = screenWidth > 600 ? 280.0 * sizeFactor : 140.0;
     final double angleStep = pi / (karten.length - 1);
     final double currentAngle = angleStep * index;
 
-    final double xOffset = radius * (1 - cos(currentAngle));
-    final double yOffset = radius * sin(currentAngle);
-
     return Positioned(
-        left: centerX - cardWidth / 2 - xOffset,
-        top: centerY - cardHeight / 2 - yOffset,
-        child: Transform.rotate(
-          angle: -currentAngle,
-          child: GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedCard = kartenname;
-              });
-              _showCard(context);
-            },
-            child: Image.asset(
-              'images/back.png',
-              width: cardWidth,
-              height: cardHeight,
-            ),
+      left: centerX - cardWidth / 2 - radius * (1 - cos(currentAngle)),
+      top: centerY - cardHeight / 2 - radius * sin(currentAngle) + (selectedCard == kartenname ? -20 : 0), // Verschieben der ausgewählten Karte nach oben
+      child: Transform.rotate(
+        angle: -currentAngle,
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              if (selectedCard == kartenname) {
+                if (!isSecondTap) {
+                  setState(() {
+                    isSecondTap = true;
+                  });
+                } else {
+                  setState(() {
+                    isSecondTap = false;
+                    shouldShowCard = true;
+                  });
+                  _showCard(context);
+                }
+              } else {
+                setState(() {
+                  selectedCard = kartenname;
+                  isSecondTap = false;
+                });
+              }
+            });
+          },
+          child: Image.asset(
+            'images/back.png',
+            width: cardWidth,
+            height: cardHeight,
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   // Anzeigen einer ausgewählten Karte in einer Dialogbox
   void _showCard(BuildContext context) {
-    String newCard;
-    String newDesc;
-    do {
-      newCard = karten[Random().nextInt(karten.length)];
-      newDesc = translation.translate(newCard);
-    } while (newCard == selectedCard);
-    setState(() {
-      selectedCard = newCard;
-    });
+    final String description = translation.translate(selectedCard);
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -128,18 +151,19 @@ class CardStack extends State<CardStackWidget> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => Kartenbeschreibung(
-                    kartenname: newCard,
-                    description: newDesc,
+                    kartenname: selectedCard,
+                    description: description,
                   ),
                 ),
               );
             }
           },
+
           child: Stack(
             alignment: Alignment.center,
             children: [
               Image.asset(
-                'images/$newCard',
+                'images/$selectedCard',
                 width: MediaQuery.of(context).size.width * 0.7,
                 height: MediaQuery.of(context).size.height * 0.7,
                 fit: BoxFit.contain,
@@ -147,7 +171,7 @@ class CardStack extends State<CardStackWidget> {
               Positioned(
                 top: 20,
                 child: Text(
-                  newCard,
+                  selectedCard,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -173,8 +197,8 @@ class CardStack extends State<CardStackWidget> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => Kartenbeschreibung(
-                            kartenname: newCard,
-                            description: newDesc,
+                            kartenname: selectedCard,
+                            description: description,
                           ),
                         ),
                       );
@@ -191,5 +215,6 @@ class CardStack extends State<CardStackWidget> {
         );
       },
     );
+    shouldShowCard = false;
   }
 }
