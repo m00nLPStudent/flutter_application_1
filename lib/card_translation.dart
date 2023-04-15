@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/services.dart' show rootBundle;
+import 'card_item.dart';
 
 class Entry {
   Entry({required this.name, required this.description});
@@ -27,7 +28,8 @@ class Translation {
 
   final Map<String, String> entries;
 
-  String translate(String key) {
+  String translate(CardItem card) {
+    String key = card.fileName;
     return entries[key] ?? "<missing translation for '$key'>";
   }
 

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'card_item.dart';
 
 class Kartenbeschreibung extends StatelessWidget {
-  const Kartenbeschreibung({super.key, required this.kartenname, required this.description});
+  const Kartenbeschreibung({Key? key, required this.kartenname, required this.description})
+      : super(key: key);
 
-  final String kartenname;
+  final CardItem kartenname;
   final String description;
 
   @override
@@ -30,7 +32,7 @@ class Kartenbeschreibung extends StatelessWidget {
             child: Opacity(
               opacity: 0.7,
               child: Image.asset(
-                'images/$kartenname',
+                'images/${kartenname.fileName}',
                 width: MediaQuery.of(context).size.width * 0.8,
                 height: MediaQuery.of(context).size.height * 0.6,
                 fit: BoxFit.contain,
@@ -83,7 +85,7 @@ class Kartenbeschreibung extends StatelessWidget {
               top: MediaQuery.of(context).size.height * 0.2,
               left: MediaQuery.of(context).size.width * 0.1,
               child: Text(
-                kartenname,
+                kartenname.fileName,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -96,18 +98,3 @@ class Kartenbeschreibung extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
